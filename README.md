@@ -50,7 +50,7 @@ pip install -r requirements.txt
 
 ### Data Preparation
 
-We utilize diverse datasets across three scientific paradigms. Please download and place them in the `data/` folder:
+Following prior work, we utilize diverse datasets across three scientific paradigms. The dataset can be downloaded from [CodeMagic/Omni-Mol-Dataset](https://huggingface.co/datasets/CodeMagic/Omni-Mol-Dataset). Please download and place them in the `data/` folder: 
 
 * **Pre-training**: PubChem (Molecule-Text pairs).
 * **Mol2Mol**: Reaction, Retrosynthesis, Reagent).
