@@ -1,0 +1,36 @@
+import argparse
+import json
+import os
+import sys
+
+
+from metrics import calculate_mae_with_text
+
+def main(args):
+    with open(args.input_file, 'r') as f:
+        data = json.load(f)
+    
+    # generate_sample.py outputs: {"prompt": ..., "gt_self": ..., "pred_self": ...}
+    # metrics.py's calculate_mae_with_text expects: {"gt": ..., "pred": ...}
+    
+    formatted_data = []
+    for item in data:
+        formatted_data.append({
+            "gt": item.get("gt_self", item.get("gt")),
+            "pred": item.get("pred_self", item.get("pred"))
+        })
+
+    metrics = calculate_mae_with_text(
+        formatted_data, 
+        save_path=args.output_file, 
+        eos_token=None 
+    )
+    
+    print(json.dumps(metrics, indent=2))
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input_file", type=str, required=True, help="Path to the inference output jsonl/json file")
+    parser.add_argument("--output_file", type=str, default=None, help="Path to save the metrics json file")
+    args = parser.parse_args()
+    main(args)
