@@ -1,44 +1,46 @@
-# MoRA: On-the-fly Molecule-aware Low-Rank Adaptation Framework for LLM-based Multi-Modal Molecular Assistant
-
-<div align="center">
-  <img src="image/model.png" alt="MoRA Framework Architecture" width="800"/>
-</div>
+# MoIRA: Molecule-Graph Guided Parameter Space Alignment for Molecular Multimodal LLMs
 
 ## 📖 Overview
 
-MoRA (Molecule-aware Low-Rank Adaptation) is an innovative multi-modal molecular assistant framework specifically designed for handling molecule-related tasks. 
+**MoIRA** (Molecule-Graph Guided Parameter Space Alignment) is a novel framework that fundamentally shifts molecular multimodal modeling from **Input Space Alignment** to **Parameter Space Modulation**.
+
+Unlike existing methods that represent molecular graphs as long sequences of tokens (flattening complex topologies and inflating the context window), MoIRA employs a **Molecule-Aware Weight Generator** to distill structural features into dynamic, instance-specific low-rank parameter updates. These updates are injected directly into a frozen LLM, enabling it to "perceive" molecular structures through its weights rather than its input context.
 
 ### 🌟 Key Features
 
-- **Dynamic Weight Generation**: Dynamically generates mora adaptation weights based on molecular graph structures, enabling molecule-aware model adaptation
-- **Multi-modal Fusion**: Seamlessly integrates text and molecular graph information, supporting complex molecule-text interaction tasks
-- **Multi-task Support**: Supports various molecule-related tasks including molecular description generation, property prediction, reaction prediction, etc.
-- **Scalable Architecture**: Modular design that is easily extensible to new molecular tasks and datasets
-- **Frozen LLM**: Freezes LLM parameters and only trains MoRA adaptation layers
+* **Parameter Space Alignment**: Decouples molecular perception from the input stream. No graph tokens are added to the context window.
+* ** Context Efficiency**: Inference cost remains constant regardless of molecular size (atom count), avoiding the quadratic complexity bottleneck of standard attention mechanisms.
+* **Structurally-Aware Reasoning**: Utilizes a hierarchical **Adaptive Weight Generator (AW-Gen)** to inject chemical knowledge into both Self-Attention () and FFN () layers.
+* **Chemical Validity Guarantee**: Adopts **SELFIES** representation instead of SMILES to strictly ensure the chemical validity of generated outputs.
+* **Unified SOTA Performance**: Achieves State-of-the-Art results across **11 diverse tasks** covering Mol2Mol (Reaction), Mol2Text (Captioning), and Mol2Num (Property Prediction) paradigms.
 
 ## 🏗️ Architecture Design
 
-### Core Innovations
+### Core Mechanism: Dual-Stream Processing
 
-- **On-the-fly Weight Generation**: Unlike traditional static mora weights, MoRA dynamically generates adaptation weights based on input molecules
-- **Molecule-aware Adaptation**: The weight generation process fully considers molecular structural information, achieving true molecule awareness
-- **Hierarchical Weight Control**: Supports applying different adaptation strategies at different Transformer layers
+MoIRA strictly separates parameter modulation from textual interaction:
+
+1. **Stream A (Parameter Modulation)**: The molecular graph is processed by a frozen GNN and the **Adaptive Weight Generator** to produce low-rank adaptation weights ().
+2. **Stream B (Textual Interaction)**: The user instruction enters the LLM as standard text. The LLM processes this text using the *modulated* weights , implicitly reasoning about the molecule.
+
+### Component Details
+
+* **Graph Encoder**: Frozen **MoleculeSTM** (300-dim embedding).
+* **LLM Backbone**: Frozen **Vicuna v1.5-7B**.
+* **Adaptive Weight Generator**:
+* **Cross-Attention Distillation**: 8 decoder blocks with 4 learnable molecular queries.
+* **Low-Rank Projection**: Generates updates with rank .
+
 
 ## 🚀 Quick Start
 
-### Pretrained graph encoder
-
-We utilized the pre-trained graph encoder checkpoint from the paper of "MoleculeSTM: Multi-modal Molecule Structure-text Model for Text-based Editing and Retrieval". You can download the pre-trained graph encoder checkpoint from GitHub. Place the pretrained graph model in the `MoleculeSTM/' folder.
-
-### Datasets
-
-You can download the datasets from the paper of "Mol-Instructions: A Large-Scale Biomolecular Instruction Dataset for Large Language Models". Place both datasets (MoleculeDesc, instruction_tuning) in the `data/` folder.
-
 ### Requirements
 
-- Python 3.8+
-- PyTorch 1.12+
-- CUDA 11.0+ (recommended)
+* Python 3.8+
+* PyTorch 1.12+
+* CUDA 11.0+ (8x A800 GPUs recommended for full replication)
+* **Vicuna v1.5-7B** checkpoints
+* **MoleculeSTM** pretrained graph encoder
 
 ### Install Dependencies
 
@@ -46,98 +48,96 @@ You can download the datasets from the paper of "Mol-Instructions: A Large-Scale
 pip install -r requirements.txt
 ```
 
+### Data Preparation
+
+We utilize diverse datasets across three scientific paradigms. Please download and place them in the `data/` folder:
+
+* **Pre-training**: PubChem (Molecule-Text pairs).
+* **Mol2Mol**: Reaction, Retrosynthesis, Reagent).
+* **Mol2Text**: ChEBI-20, PubChemQA.
+* **Mol2Num**: QM9, YieldBERT datasets.
+
 ### Model Training
 
-#### 1. Molecular Description Generation (MolCap)
+MolRA uses a two-stage training pipeline: **Stage 1 (Alignment)** and **Stage 2 (Instruction Tuning)**.
+
+#### 1. Forward Reaction Prediction (Mol2Mol)
 
 ```bash
-bash scripts/finetune_mora_molcap.sh
+bash scripts/finetune_MolRA_forward_pred.sh
+
 ```
 
-#### 2. Molecular Property Prediction
+#### 2. Retrosynthesis Prediction (Mol2Mol)
 
 ```bash
-bash scripts/finetune_mora_property_pred.sh
+bash scripts/finetune_MolRA_retrosynthesis.sh
+
 ```
 
-#### 3. Forward Reaction Prediction
+#### 3. Molecular Captioning (Mol2Text)
 
 ```bash
-bash scripts/finetune_mora_forward_pred.sh
+bash scripts/finetune_MolRA_molcap.sh
+
 ```
 
-#### 4. Reagent Prediction
 
-```bash
-bash scripts/finetune_mora_reagent_pred.sh
-```
-
-#### 5. Retrosynthesis Prediction
-
-```bash
-bash scripts/finetune_mora_retrosynthesis.sh
-```
+*(Note: Ensure you configure the correct `task_type` in the scripts: `mol2mol`, `mol2text`, or `mol2num`)*
 
 ### Model Evaluation
 
-#### Molecular Description Generation Evaluation
-
 ```bash
-bash scripts/eval/molcap.sh
+# Evaluate on all 11 benchmarks
+bash scripts/eval_all_tasks.sh
+
+# Specific task evaluation
+bash scripts/eval/eval_forward_reaction.sh
+bash scripts/eval/eval_retrosynthesis.sh
+bash scripts/eval/eval_property_regression.sh
+
 ```
 
-#### Other Task Evaluations
+## 📊 Supported Tasks & Paradigms
 
-```bash
-# Property prediction
-bash scripts/eval/molcap_property.sh
+MoIRA unifies 11 tasks into a single framework:
 
-# Forward reaction prediction  
-bash scripts/eval/molcap_forward.sh
+### Paradigm I: Mol2Mol (Structural Reasoning)
 
-# Reagent prediction
-bash scripts/eval/molcap_reagent.sh
+* **Forward Reaction Prediction**: Reactants  Product (Exact Match & Validity)
+* **Retrosynthesis**: Product  Reactants
+* **Reagent Prediction**: Reactants + Product  Reagents
+* **Catalyst Prediction**: Reactants + Product  Catalyst
+* **Solvent Prediction**: Reaction  Solvent
 
-# Retrosynthesis prediction
-bash scripts/eval/molcap_retro.sh
-```
+### Paradigm II: Mol2Text (Cross-modal Translation)
 
-## 📊 Supported Tasks
+* **Molecular Captioning**: Generating descriptions from graphs.
+* **Description Q&A**: Answering open-ended questions.
+* **Experimental Procedure**: Generating step-by-step lab recipes.
 
-### 1. Molecular Description Generation (Molecular Captioning)
-- Input: Molecular SMILES structure
-- Output: Natural language description
-- Evaluation metrics: BLEU, METEOR, ROUGE
+### Paradigm III: Mol2Num (Quantitative Reasoning)
 
-### 2. Molecular Property Prediction
-- Input: Molecular structure + property query
-- Output: Predicted molecular property values
-- Supported properties: Solubility, toxicity, bioactivity, etc.
-
-### 3. Reaction Prediction
-- **Forward Prediction**: Reactants → Products
-- **Retrosynthesis Prediction**: Products → Reactants
-- **Reagent Prediction**: Reactants + Products → Catalysts/Reagents
-
-### 4. Molecular Question Answering (Molecular QA)
-- Question answering tasks based on molecular structures
-- Supports complex molecule-related reasoning
+* **QM9 Property Prediction**: HOMO, LUMO, Gap energy (Regression).
+* **Yield Prediction**: Predicting reaction efficiency ratios.
 
 ## 🔧 Configuration
 
-### Model Configuration Parameters
+Default hyperparameters based on the paper's Appendix A3:
 
 ```python
-# MoRA core parameters
-mora_dim: 512              # Hidden dimension of weight generator
-mora_depth: 2              # Number of layers in weight generator
-mora_visual_dim: 768       # Molecular feature dimension
-mora_pos_num: 256          # Number of positional encodings
-mora_llm_dim: 4096         # LLM hidden dimension
-mora_llm_depth: 32         # Number of LLM layers
-mora_rank: 64              # MoRA rank
-mora_type: "qkvom"         # Attention components to adapt
-mora_alpha: 64             # MoRA scaling factor
-weights_sep: True          # Whether to separate weight generation
-skip_layers: 1             # Number of layers to skip
+# MoIRA Model Configuration
+model_config = {
+    MolRA_dim: 512              # Hidden dimension of weight generator
+    MolRA_depth: 2              # Number of layers in weight generator
+    MolRA_pos_num: 256          # Number of positional encodings
+    MolRA_llm_dim: 4096         # LLM hidden dimension
+    MolRA_llm_depth: 32         # Number of LLM layers
+    MolRA_rank: 64              # MolRA rank
+    MolRA_type: "qkvom"         # Attention components to adapt
+    MolRA_alpha: 64             # MolRA scaling factor
+    weights_sep: True          # Whether to separate weight generation
+    skip_layers: 1             # Number of layers to skip
+}
+
 ```
