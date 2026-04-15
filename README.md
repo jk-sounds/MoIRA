@@ -137,7 +137,7 @@ model_config = {
     MolRA_type: "qkvom"         # Attention components to adapt
     MolRA_alpha: 64             # MolRA scaling factor
     weights_sep: True          # Whether to separate weight generation
-    skip_layers: 1             # Number of layers to skip
+    skip_layers: 4             # Number of layers to skip
 }
 
 ```
