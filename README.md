@@ -21,7 +21,7 @@ Unlike existing methods that represent molecular graphs as long sequences of tok
 MoIRA strictly separates parameter modulation from textual interaction:
 
 1. **Stream A (Parameter Modulation)**: The molecular graph is processed by a frozen GNN and the **Adaptive Weight Generator** to produce low-rank adaptation weights ().
-2. **Stream B (Textual Interaction)**: The user instruction enters the LLM as standard text. The LLM processes this text using the *modulated* weights , implicitly reasoning about the molecule.
+2. **Stream B (Textual Interaction)**: The user instruction enters the LLM as standard text. The LLM processes this text using the *modulated* weights, implicitly reasoning about the molecule.
 
 ### Component Details
 
@@ -50,7 +50,7 @@ pip install -r requirements.txt
 
 ### Data Preparation
 
-Following prior work, we utilize diverse datasets across three scientific paradigms. The dataset can be downloaded from [CodeMagic/Omni-Mol-Dataset](https://huggingface.co/datasets/CodeMagic/Omni-Mol-Dataset). Please download and place them in the `data/` folder: 
+Following prior work, we utilize diverse datasets across three scientific paradigms. The dataset can be downloaded from ([https://huggingface.co/datasets/CodeMagic/Omni-Mol-Dataset](https://huggingface.co/datasets/TY123456/molra/tree/main)). Please download and place them in the `data/` folder: 
 
 * **Pre-training**: PubChem (Molecule-Text pairs).
 * **Mol2Mol**: Reaction, Retrosynthesis, Reagent).
