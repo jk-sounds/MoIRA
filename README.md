@@ -1,18 +1,12 @@
 # Efficient Molecular Graph-Language Modeling via Adaptive Weight Modulation
 
-## 📖 Overview
-
-**MoIRA** (Molecule-Graph Guided Adaptive Weight Modulation Framework) is a novel multimodal molecular framework that fundamentally shifts molecular graph integration from **Input Space Fusion** to **Parameter Space Modulation**[cite: 3803, 3940].
-
-Unlike existing methods that serialize complex molecular topologies into continuous embedding sequences (which flattens structured connectivity and inflates the context window), MoIRA treats molecular structures as modulatory signals. It converts graph-derived structural information into dynamic, instance-specific low-rank weight adaptations ($\Delta W$) that are injected into a frozen Large Language Model (LLM). This paradigm decouples structural modeling from textual processing, allowing molecular topology to modulate the model's internal computation directly.
-
 ### 🌟 Key Features
 
-* [cite_start]**Parameter Space Integration**: Absorbs molecular topology via molecule-aware weight adaptation rather than prepending graph-derived tokens to textual inputs [cite: 3932][cite_start], preserving the raw textual instruction stream[cite: 3939].
-* [cite_start]**Scalable Context Efficiency**: Bypasses the quadratic computational complexity ($\mathcal{O}(N^{2})$) bottleneck of the LLM self-attention mechanism [cite: 3818][cite_start], maintaining a minimal correlation between molecular atom counts and inference GFLOPs[cite: 4466, 4467].
-* [cite_start]**Coordinated Structural Modulation**: Transforms features into layer-wise low-rank parameter factorizations [cite: 4195][cite_start], updating both Self-Attention projection matrices ($W_q, W_k, W_v, W_o$) and the Feed-Forward Network ($W_f$)[cite: 4195, 4196].
-* [cite_start]**Syntactic Robustness**: Utilizes **SELFIES** strings instead of SMILES as the task-required target text molecular representation to guarantee syntactic validity during autoregressive decoding[cite: 5095, 5097].
-* [cite_start]**Unified Chemical Reasoning**: Achieves robust performance across **11 molecular benchmarks** spanning Mol2Mol (Structural Reasoning), Mol2Text (Cross-modal Translation), and Mol2Num (Quantitative Reasoning) paradigms[cite: 4317, 4318, 4319].
+* **Parameter Space Integration**: Absorbs molecular topology via molecule-aware weight adaptation rather than prepending graph-derived tokens to textual inputs, preserving the raw textual instruction stream.
+* **Scalable Context Efficiency**: Bypasses the quadratic computational complexity ($\mathcal{O}(N^{2})$) bottleneck of the LLM self-attention mechanism, maintaining a minimal correlation between molecular atom counts and inference GFLOPs.
+* **Coordinated Structural Modulation**: Transforms features into layer-wise low-rank parameter factorizations, updating both Self-Attention projection matrices ($W_q, W_k, W_v, W_o$) and the Feed-Forward Network ($W_f$).
+* **Syntactic Robustness**: Utilizes **SELFIES** strings instead of SMILES as the task-required target text molecular representation to guarantee syntactic validity during autoregressive decoding.
+* **Unified Chemical Reasoning**: Achieves robust performance across **11 molecular benchmarks** spanning Mol2Mol (Structural Reasoning), Mol2Text (Cross-modal Translation), and Mol2Num (Quantitative Reasoning) paradigms.
 
 ---
 ## 🏗️ Architecture Design
