@@ -20,12 +20,9 @@ MoIRA strictly separates parameter modulation from textual interaction:
 
 ### Component Details
 
-* **Graph Encoder**: Frozen **MoleculeSTM** (300-dim embedding).
-* **LLM Backbone**: Frozen **Vicuna v1.5-7B**.
-* **Adaptive Weight Generator**:
-* **Cross-Attention Distillation**: 8 decoder blocks with 4 learnable molecular queries.
-* **Low-Rank Projection**: Generates updates with rank .
-
+* **Graph Encoder**: Frozen MoleculeSTM.
+* **LLM Backbone**: Frozen Vicuna v1.5-7B.
+* **Adaptive Weight Generator**: Cross-Attention Distillation and Parameter Projection.
 
 ## 🚀 Quick Start
 
