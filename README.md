@@ -20,8 +20,8 @@ MoIRA strictly separates parameter modulation from textual interaction:
 
 ### Component Details
 
-* **Graph Encoder**: Frozen MoleculeSTM.
-* **LLM Backbone**: Frozen Vicuna v1.5-7B.
+* **Graph Encoder**: MoleculeSTM.
+* **LLM Backbone**: Vicuna v1.5-7B.
 * **Adaptive Weight Generator**: Cross-Attention Distillation and Parameter Projection.
 
 ## 🚀 Quick Start
@@ -30,9 +30,9 @@ MoIRA strictly separates parameter modulation from textual interaction:
 
 * Python 3.8+
 * PyTorch 1.12+
-* CUDA 11.0+ (8x A800 GPUs recommended for full replication)
-* **Vicuna v1.5-7B** checkpoints
-* **MoleculeSTM** pretrained graph encoder
+* CUDA 11.0+ 
+* Vicuna v1.5-7B 
+* MoleculeSTM
 
 ### Install Dependencies
 
